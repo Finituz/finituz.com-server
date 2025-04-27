@@ -10,6 +10,7 @@
     "dev": "nodemon -r dotenv/config ./server.js"
   },
   "dependencies": {
+    "colors": "^1.4.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.1",

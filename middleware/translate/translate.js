@@ -1,18 +1,31 @@
 async function translateText(text, sl = "en", tl = "pt") {
   try {
-    const response = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`,
-    );
+    const response = await fetch("http://172.17.0.3:5000/translate", {
+      // docker translator subnet
+      method: "POST",
+      body: JSON.stringify({
+        q: [text],
+        source: "auto",
+        target: tl,
+        format: "text",
+        api_key: "",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
 
-    if (!response.ok) throw new Error("Translation API request failed");
+    if (!response.ok)
+      throw new Error("Translation API request failed", response);
 
     const data = await response.json();
+    console.log(data);
+    const translatedText = await data["translatedText"];
 
-    // The translated text is in data[0][0][0]
-    const translatedText = data[0]?.map((part) => part[0]).join("") ?? "";
+    if (!translatedText) {
+      throw new Error("Can't find translated text.", response);
+    }
 
     console.log("Translated: ", translatedText);
-    return translatedText;
+    return String(translatedText);
   } catch (error) {
     console.error("Translation error: ", error);
     return null;
